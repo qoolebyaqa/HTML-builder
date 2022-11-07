@@ -12,10 +12,11 @@ fs.mkdir(path.join(__dirname, 'project-dist'), (err) => {
     if (err) { 
     }
     const toArrayHtml = new Promise((resolve, reject) => {   
-        fs.readdir(htmlFolder, (err, files) => {          
-            const arrcontent = [];         
+        fs.readdir(htmlFolder, (err, files) => {
+                   
             if (err) {        
                 console.log(err);
+                const obj1 = {};
                 for (let i = 0; i < files.length; i++) {
                     if (files[i].slice(files[i].lastIndexOf('.')+1) === 'html') {
                         const fileToRead = (htmlFolder + '/' + files[i]);
@@ -24,24 +25,26 @@ fs.mkdir(path.join(__dirname, 'project-dist'), (err) => {
                                 reject(err);                            
                             }
                             const content = data.toString();
-                            arrcontent.push(content);
-                            resolve(arrcontent);  
+                            obj1[files[i]]= content;
+                            resolve(obj1);  
                         });
                     }
                 }              
                             
             } 
             else {
+                const obj1 = {};
                 for (let i = 0; i < files.length; i++) {
                     if (files[i].slice(files[i].lastIndexOf('.')+1) === 'html') {
                         const fileToRead = (htmlFolder + '/' + files[i]);
+                        
                         fs.readFile(fileToRead, function(err, data) {
                             if (err) {
                                 reject(err);
                             }
                             const content = data.toString();
-                            arrcontent.push(content);
-                            resolve(arrcontent);
+                            obj1[files[i]]= content;
+                            resolve(obj1);
                         });
                     }
                 }              
@@ -52,7 +55,7 @@ fs.mkdir(path.join(__dirname, 'project-dist'), (err) => {
             
     })
         
-    toArrayHtml.then(arrcontent => {
+    toArrayHtml.then(obj1_prom => {
         const htmlToRead = (__dirname+'/template.html');
         let streamRead = fs.createReadStream(htmlToRead);
         streamRead.on('readable', (err) => {
@@ -62,15 +65,38 @@ fs.mkdir(path.join(__dirname, 'project-dist'), (err) => {
             let text = streamRead.read();
             if (text) {
                 const arrStr = text.toString().split('');
-                arrStr.splice(arrStr.indexOf('{', '{', 'h'), 10, arrcontent[1]);
-                arrStr.splice(arrStr.indexOf('{', '{', 'f'), 12, arrcontent[0]);
-                arrStr.splice(arrStr.indexOf('{', '{', 'h'), 10, arrcontent[2]);
-                const strtoHTML = arrStr.join('');            
-                fs.writeFile(htmlBundle, strtoHTML, err => {
-                    if (err) {
-                        throw err;
+                const arrNames = [];
+                const arrNames2 = [];
+                fs.readdir(htmlFolder, (err, files) => {
+                    if (err) console.log(err);
+                    for (let value of files) {
+                        arrNames.push(`{{${value.slice(0, value.lastIndexOf('.'))}}}`);
+                        arrNames2.push(value);
                     }
+                    
+                    if (arrNames.length > 3) {
+                        let result = arrStr.join('').replace(arrNames[0], obj1_prom[arrNames2[0].toString()]).replace(arrNames[1], obj1_prom[arrNames2[1].toString()]).replace(arrNames[2], obj1_prom[arrNames2[2].toString()]).replace(arrNames[3], obj1_prom[arrNames2[3].toString()]);
+                        
+                        const strtoHTML = result;
+                        fs.writeFile(htmlBundle, strtoHTML, err => {
+                            if (err) {
+                                throw err;
+                            }
+                        }) 
+                    }
+                    else {
+                        let result = arrStr.join('').replace(arrNames[0], obj1_prom[arrNames2[0].toString()]).replace(arrNames[1], obj1_prom[arrNames2[1].toString()]).replace(arrNames[2], obj1_prom[arrNames2[2].toString()]);
+                        
+                        const strtoHTML = result;
+                        fs.writeFile(htmlBundle, strtoHTML, err => {
+                            if (err) {
+                                throw err;
+                            }
+                        }) 
+                    }  
+                    
                 })
+                
                 
                 
             }
@@ -135,20 +161,40 @@ fs.mkdir(dublicateF, err => {
                 if (stats.isDirectory()) {
                     fs.mkdir(newFolder, err => {
                         if (err) { 
+                            
                         }
+                        
                     });
                     fs.readdir(way, (err, files) => {
                         if (err) { throw err; }
-                        for (let file of files) {
-                            oldPath = oldFolder + '/' + file;
-                            newPath = newFolder + '/' + file;
-
-                            fs.copyFile(oldPath, newPath, (err) => {
+                        const deletePromise = new Promise((resolve, reject) => {
+                            fs.readdir(newFolder, (err, files) => {
                                 if (err) {
-                                    throw err;
+                                    
                                 }
-                            })
-                        }
+                                
+                                files.forEach((value) => {
+                                    fs.unlink((newFolder+'/'+value), err => {
+                                        if (err){}
+                                    })
+                                });
+                                resolve(newFolder);
+                            });
+                        })
+                        deletePromise.then(newFolder => {
+                            for (let file of files) {
+                                oldPath = oldFolder + '/' + file;
+                                newPath = newFolder + '/' + file;
+    
+                                
+                                fs.copyFile(oldPath, newPath, (err) => {
+                                    if (err) {
+                                        throw err;
+                                    }
+                                })
+                            }
+                        }); 
+                        
                     })
                 };
             })

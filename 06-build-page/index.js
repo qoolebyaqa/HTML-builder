@@ -170,7 +170,7 @@ fs.mkdir(dublicateF, err => {
                         const deletePromise = new Promise((resolve, reject) => {
                             fs.readdir(newFolder, (err, files) => {
                                 if (err) {
-                                    
+                                    reject(newFolder);
                                 }
                                 
                                 files.forEach((value) => {

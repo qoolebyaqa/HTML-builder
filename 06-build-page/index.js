@@ -75,7 +75,7 @@ fs.mkdir(path.join(__dirname, 'project-dist'), (err) => {
                     }
                     
                     if (arrNames.length > 3) {
-                        let result = arrStr.join('').replace(arrNames[0], obj1_prom[arrNames2[0].toString()]).replace(arrNames[1], obj1_prom[arrNames2[1].toString()]).replace(arrNames[2], obj1_prom[arrNames2[2].toString()]).replace(arrNames[3], obj1_prom[arrNames2[3].toString()]);
+                        let result = arrStr.join('').replaceAll(arrNames[0], obj1_prom[arrNames2[0].toString()]).replaceAll(arrNames[1], obj1_prom[arrNames2[1].toString()]).replaceAll(arrNames[2], obj1_prom[arrNames2[2].toString()]).replaceAll(arrNames[3], obj1_prom[arrNames2[3].toString()]);
                         
                         const strtoHTML = result;
                         fs.writeFile(htmlBundle, strtoHTML, err => {
@@ -85,7 +85,7 @@ fs.mkdir(path.join(__dirname, 'project-dist'), (err) => {
                         }) 
                     }
                     else {
-                        let result = arrStr.join('').replace(arrNames[0], obj1_prom[arrNames2[0].toString()]).replace(arrNames[1], obj1_prom[arrNames2[1].toString()]).replace(arrNames[2], obj1_prom[arrNames2[2].toString()]);
+                        let result = arrStr.join('').replaceAll(arrNames[0], obj1_prom[arrNames2[0].toString()]).replaceAll(arrNames[1], obj1_prom[arrNames2[1].toString()]).replaceAll(arrNames[2], obj1_prom[arrNames2[2].toString()]);
                         
                         const strtoHTML = result;
                         fs.writeFile(htmlBundle, strtoHTML, err => {

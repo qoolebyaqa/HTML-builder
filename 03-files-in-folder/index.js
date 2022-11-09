@@ -19,9 +19,7 @@ fs.readdir(pathUse, (err, files) => {
                 }
                 else {
                     if (stats.isDirectory()) {
-                        let nameF = value;
-                        kb = stats.size;
-                        console.log(`${nameF} - folder - ${(kb/1024).toFixed(2) + ' kb'}`);
+                        
                     }
                     else {
                         let nameF = value.slice(0, value.lastIndexOf('.'));
